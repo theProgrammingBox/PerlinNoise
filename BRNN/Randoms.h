@@ -88,11 +88,7 @@ const double DoubleRandom2D(uint64_t seed, double x, double y) // -1 through 1
 	return IntRandom2D(seed, x, y) * 1.08420217249e-19;
 }
 
-//double Interpolate(double a, double b, double x) { return (b - a) * (x * x * x * (x * (x * 6 - 15) + 10)) + a; }
-
 double Interpolate(double a, double b, double x) { return (b - a) * (x * x * (3 - x - x)) + a; }
-
-//double Interpolate(double a, double b, double x) { return (b - a) * x + a; }
 
 double Interpolate2D(uint64_t seed, double x, double y)
 {
