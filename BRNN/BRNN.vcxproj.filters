@@ -24,6 +24,24 @@
     <ClInclude Include="OpenSimplex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BRNNParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BRNNConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BRNNValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BRNNGradients.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BRNNTrainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

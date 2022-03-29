@@ -139,6 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BRNNGradients.h" />
+    <ClInclude Include="BRNNParameters.h" />
+    <ClInclude Include="BRNNConfig.h" />
+    <ClInclude Include="BRNNTrainer.h" />
+    <ClInclude Include="BRNNValues.h" />
+    <ClInclude Include="Environment.h" />
     <ClInclude Include="OpenSimplex.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="Randoms.h" />

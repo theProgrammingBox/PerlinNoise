@@ -1,27 +1,35 @@
 #define OLC_PGE_APPLICATION
-#include "Randoms.h"
-#include "OpenSimplex.h"
 #include "olcPixelGameEngine.h"
+#include "BRNNTrainer.h"
 
 using olc::Key;
 using olc::vi2d;
 using olc::Pixel;
 
 using std::cout;
+using std::cin;
 using std::endl;
 using std::max;
 using std::min;
 
-const int screenSize = 500;
-const int screenResolution = 2;
-const double halfScreenSize = screenSize / 2;
+double FalseActivation(double x)
+{
+	return x < -1 ? -1 : (x > 1 ? 1 : 1.5 * x - 0.5 * x * x * x);
+}
+
+double FalseActivationGradient(double x, double g)
+{
+	return x < -1 ? (g < -1 ? 0 : 1) : (x > 1 ? (g > 1 ? 0 : 1) : 1.5 - 1.5 * x * x);
+}
 
 class Example : public olc::PixelGameEngine
 {
 public:
 	Random random;
-	OpenSimplexNoise noise;
-	double z;
+	int count;
+	double a;
+	double b;
+	double c;
 
 	Pixel mapToWeight(double d) { // -1 - 1
 		double r = (d < 0) ? min(1.0, -2 * d) : 0;
@@ -43,38 +51,51 @@ public:
 
 	Example()
 	{
-		sAppName = "PerlinRandom";
+		sAppName = "Visualizing";
 	}
 
 	bool OnUserCreate() override
 	{
 		random = Random();
-		noise = OpenSimplexNoise(random.ULongRandom());
-		z = 0;
+		count = 0;
+
+		a = random.DoubleRandom();
+		b = random.DoubleRandom();
+		c = random.DoubleRandom();
 
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		if (GetKey(Key::SPACE).bPressed) { noise = OpenSimplexNoise(random.ULongRandom()); }
+		double i1 = random.DoubleRandom();
+		double i2 = random.DoubleRandom();
 
-		z += 0.05;
-		for (int x = 0; x < screenSize; x++)
-			for (int y = 0; y < screenSize; y++)
+		double i = (a * i1 + b * i2 + c);
+		double o = i * i * i;
+		double e = (i1 + i2) / 2.0;
+		double dO = e - o;
+		double di = 3 * i * i * dO;
+		double da = i1 * di;
+		double db = i2 * di;
+		double dc = di;
+
+		a += da * 0.005;
+		b += db * 0.005;
+		c += dc * 0.005;
+		if (count++ == 1000)
+		{
+			if (abs(dO) < 0.1)
 			{
-				double mx = x - halfScreenSize;
-				double my = y - halfScreenSize;
-				double layeredNoise =
-					noise.Evaluate(x * 0.02, y * 0.02, z + 100) * (3.0 / 6.0) +
-					noise.Evaluate(x * 0.04, y * 0.04, z + 050) * (2.0 / 6.0) +
-					noise.Evaluate(x * 0.08, y * 0.08, z + 000) * (1.0 / 6.0);
-				double value = layeredNoise * max(0.0, 1 - (mx * mx + my * my) / (halfScreenSize * halfScreenSize));
-
-				FillRect(vi2d(x, y), vi2d(1, 1), mapToWeight(value));
-				//FillRect(vi2d(x, y), vi2d(1, 1), mapToBAndW(value * 0.5 + 0.5)); // covert from -1 - 1 to 0 - 1
-				//FillRect(vi2d(x, y), vi2d(1, 1), mapToRainbow(value * 0.5 + 0.5)); // covert from -1 - 1 to 0 - 1
+				cout << "a: " << a << endl;
+				cout << "b: " << b << endl;
+				cout << "c: " << c << "\n\n";
 			}
+
+			count = 0;
+			FillRect(vi2d(0, 0), vi2d(1000, 1000), olc::BLACK);
+			FillRect(vi2d(0, 0), vi2d(100, 100 * abs(dO)));
+		}
 
 		return true;
 	}
@@ -82,10 +103,29 @@ public:
 
 int main()
 {
-	Example demo;
+	/*Example demo;
 
-	if (demo.Construct(screenSize, screenSize, screenResolution, screenResolution))
-		demo.Start();
+	if (demo.Construct(1000, 1000, 1, 1))
+		demo.Start();*/
+
+	BRNNTrainer networkTrainer;
+
+	networkTrainer = BRNNTrainer();
+	//networkTrainer.ResetNetwork(); // resets the parameter
+//	networkTrainer.LoadNetwork("Network.txt"); // loads the parameter
+
+	while (true)
+	{
+		networkTrainer.Train(1000);
+		//networkTrainer.SaveNetwork("Network.txt");
+	}
+	//networkTrainer.Train(1);
+
+	//	NetworkParameters networkParameters;
+	//	NetworkValues networkValues;
+	//
+	//	networkParameters.Reset();
+	//	networkValues.Assign(&networkParameters);
 
 	return 0;
 }
